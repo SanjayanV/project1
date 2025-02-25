@@ -4,7 +4,7 @@ import userRoutes from './routes/userRoute.js';
 import connectDB from "./db/connectDB.js";
 import cors from "cors";
 import cookieParser from 'cookie-parser';
-
+import productRoute from './routes/productRoute.js'; 
 
 
 const app = express();
@@ -23,9 +23,12 @@ app.use(cors())
 app.use(express.json());
 
 //endpoints
-app.use("/api", userRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/products",productRoute);
 
 
 app.listen(PORT,()=>{console.log(`Server started at http://localhost:${PORT}`)});
 connectDB();
 console.log(process.env)
+
+

@@ -1,7 +1,7 @@
 import express from "express";
 import { register, login, logout } from "../controllers/user.controller.js";
 import { verifyToken } from "../middlewares/auth.js";
-
+import {authMiddleware} from "../middlewares/authMiddleware.js"
 const router = express.Router();
 
 router.post("/register", register);
@@ -12,5 +12,10 @@ router.post("/logout", logout);
 router.get("/protected", verifyToken, (req, res) => {
   res.json({ message: "Access granted", user: req.user });
 });
+
+router.get("/debug-token", authMiddleware, (req, res) => {
+  res.json({ userId: req.user.id });
+});
+
 
 export default router;
