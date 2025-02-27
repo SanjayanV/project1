@@ -19,8 +19,15 @@ app.use(cookieParser());
 
 app.use(express.urlencoded({ extended: true })); // Allow form data
 
-app.use(cors())
+const corsOptions = {
+    origin: "http://localhost:3000", // Match your frontend
+    credentials: true,
+    optionsSuccessStatus: 200,
+  };
+  
+app.use(cors(corsOptions));
 app.use(express.json());
+
 
 //endpoints
 app.use("/api/user", userRoutes);
