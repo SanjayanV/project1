@@ -71,14 +71,14 @@ const Dashboard = () => {
     return crops[Math.floor(Math.random() * crops.length)];
   };
 
-  // Chart data
+  // Chart data (updated with green theme colors)
   const generateOrdersData = () => ({
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
     datasets: [{
       label: "Orders",
       data: Array.from({ length: 7 }, () => Math.floor(Math.random() * 100)),
-      backgroundColor: "rgba(75, 192, 192, 0.6)",
-      borderColor: "rgba(75, 192, 192, 1)",
+      backgroundColor: "#2ECC7180", // Vibrant green with 50% opacity
+      borderColor: "#2ECC71",
       borderWidth: 2,
     }],
   });
@@ -89,14 +89,13 @@ const Dashboard = () => {
       label: "Sales",
       data: Array.from({ length: 5 }, () => Math.floor(Math.random() * 100)),
       backgroundColor: [
-        "rgba(255, 99, 132, 0.6)",
-        "rgba(54, 162, 235, 0.6)",
-        "rgba(255, 206, 86, 0.6)",
-        "rgba(75, 192, 192, 0.6)",
-        "rgba(153, 102, 255, 0.6)",
+        "#2ECC7180", // Vibrant green
+        "#27AE6080", // Darker green
+        "#2ECC7180", // Vibrant green
+        "#27AE6080", // Darker green
+        "#2ECC7180", // Vibrant green
       ],
-      borderColor: ["rgba(255, 99, 132, 1)", "rgba(54, 162, 235, 1)", "rgba(255, 206, 86, 1)", 
-                   "rgba(75, 192, 192, 1)", "rgba(153, 102, 255, 1)"],
+      borderColor: ["#2ECC71", "#27AE60", "#2ECC71", "#27AE60", "#2ECC71"],
       borderWidth: 2,
     }],
   });
@@ -105,17 +104,18 @@ const Dashboard = () => {
     responsive: true, 
     maintainAspectRatio: false,
     plugins: { 
-      legend: { position: "top" }, 
-      title: { display: true, text: "Orders Graph" } 
-    } 
+      legend: { position: "top", labels: { color: "#E6E6EA" } }, 
+      title: { display: true, text: "Orders Graph", color: "#27AE60", font: { size: 18 } } 
+    },
+    scales: { x: { ticks: { color: "#E6E6EA" } }, y: { ticks: { color: "#E6E6EA" } } }
   };
   
   const pieOptions = { 
     responsive: true, 
     maintainAspectRatio: false,
     plugins: { 
-      legend: { position: "top" }, 
-      title: { display: true, text: "Analytics" } 
+      legend: { position: "top", labels: { color: "#E6E6EA" } }, 
+      title: { display: true, text: "Analytics", color: "#27AE60", font: { size: 18 } } 
     } 
   };
 
@@ -163,8 +163,8 @@ const Dashboard = () => {
   return (
     <motion.div 
       className={`min-h-screen p-8 ${darkMode 
-        ? "bg-gray-900 text-white" 
-        : "bg-gradient-to-br from-emerald-50 via-lime-50 to-cyan-50 text-gray-800"}`}
+        ? "bg-[#1A202C] text-[#E6E6EA]" 
+        : "bg-gradient-to-br from-[#2D3748] via-[#1A202C] to-[#1A202C] text-[#E6E6EA]"}`}
       variants={pageVariants}
       initial="initial"
       animate="animate"
@@ -172,12 +172,17 @@ const Dashboard = () => {
       {/* Full-screen graph */}
       {fullScreenGraph && (
         <motion.div 
-          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-[#1A202C]/90 flex items-center justify-center z-50"
           initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }}
         >
-          <div className="bg-white p-6 rounded-2xl w-11/12 max-w-4xl relative shadow-2xl">
-            <button className="absolute top-4 right-4 text-3xl text-gray-600 hover:text-gray-800" onClick={() => setFullScreenGraph(null)}>×</button>
+          <div className="bg-[#2D3748]/80 backdrop-blur-lg p-6 rounded-3xl w-11/12 max-w-4xl relative shadow-2xl border border-[#27AE60]/30">
+            <button 
+              className="absolute top-4 right-4 text-4xl text-[#E6E6EA] hover:text-[#2ECC71] transition-colors" 
+              onClick={() => setFullScreenGraph(null)}
+            >
+              ×
+            </button>
             {fullScreenGraph === "orders" && <Bar data={generateOrdersData()} options={chartOptions} />}
             {fullScreenGraph === "analytics" && <Pie data={generateAnalyticsData()} options={pieOptions} />}
           </div>
@@ -186,26 +191,26 @@ const Dashboard = () => {
 
       {/* Header */}
       <motion.div 
-        className="flex flex-col md:flex-row justify-between items-center mb-10 bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg"
+        className="flex flex-col md:flex-row justify-between items-center mb-10 bg-[#2D3748]/80 backdrop-blur-lg p-6 rounded-3xl shadow-xl border border-[#27AE60]/20"
         variants={containerVariants}
       >
         <div className="flex items-center space-x-6 mb-4 md:mb-0">
           <motion.img 
             src="https://i.pinimg.com/736x/a8/f4/6a/a8f46ad882c293af8c3fe011ce13bbb0.jpg" 
             alt="Farmer Logo" 
-            className="w-16 h-16 rounded-full border-2 border-emerald-200"
-            whileHover={{ scale: 1.1, rotate: 360 }} 
-            transition={{ duration: 0.5 }} 
+            className="w-16 h-16 rounded-full border-2 border-[#27AE60]/50 shadow-md"
+            whileHover={{ scale: 1.1, rotate: 10 }} 
+            transition={{ duration: 0.4 }} 
           />
           <div>
             <motion.h1 
-              className="text-3xl font-bold tracking-tight text-emerald-800"
-              whileHover={{ scale: 1.05 }}
+              className="text-4xl font-extrabold tracking-tight text-[#27AE60]"
+              whileHover={{ scale: 1.03 }}
             >
               Hello, Farmer!
             </motion.h1>
             <motion.button 
-              className="mt-3 px-5 py-2 bg-emerald-100 text-emerald-800 rounded-lg hover:bg-emerald-200 shadow-md"
+              className="mt-3 px-6 py-2 bg-[#2ECC71] text-[#1A202C] rounded-full hover:bg-[#27AE60] shadow-lg transition-all"
               onClick={() => setShowSettings(!showSettings)} 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -214,12 +219,12 @@ const Dashboard = () => {
             </motion.button>
             {showSettings && (
               <motion.div 
-                className="mt-3 p-4 bg-white rounded-lg shadow-xl border border-emerald-100"
-                initial={{ opacity: 0, y: -10 }} 
+                className="mt-4 p-4 bg-[#2D3748]/80 backdrop-blur-md rounded-xl shadow-lg border border-[#27AE60]/20"
+                initial={{ opacity: 0, y: -10}} 
                 animate={{ opacity: 1, y: 0 }}
               >
                 <button 
-                  className="px-5 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 shadow-md"
+                  className="px-6 py-2 bg-[#2ECC71] text-[#1A202C] rounded-full hover:bg-[#27AE60] shadow-md transition-all"
                   onClick={() => setDarkMode(!darkMode)}
                 >
                   {darkMode ? "Light Mode" : "Dark Mode"}
@@ -232,32 +237,32 @@ const Dashboard = () => {
         {/* Weather Input */}
         <motion.div 
           variants={itemVariants} 
-          className="p-5 bg-cyan-100/80 rounded-xl shadow-lg border border-cyan-200"
+          className="p-6 bg-[#2D3748]/80 backdrop-blur-lg rounded-2xl shadow-lg border border-[#27AE60]/20"
         >
-          <h3 className="font-bold text-lg text-cyan-800">Weather</h3>
+          <h3 className="font-bold text-xl text-[#27AE60]">Weather</h3>
           <input 
             type="text" 
             placeholder="Country" 
             value={country} 
             onChange={(e) => setCountry(e.target.value)} 
-            className="mt-3 p-2 w-full rounded-lg text-gray-800 bg-white/90 border border-cyan-200 focus:ring-2 focus:ring-cyan-400 focus:outline-none"
+            className="mt-3 p-3 w-full rounded-lg bg-[#1A202C]/70 border border-[#27AE60]/30 text-[#E6E6EA] placeholder-[#A0AEC0] focus:ring-2 focus:ring-[#2ECC71] focus:outline-none transition-all"
           />
           <input 
             type="text" 
             placeholder="City" 
             value={city} 
             onChange={(e) => setCity(e.target.value)} 
-            className="mt-2 p-2 w-full rounded-lg text-gray-800 bg-white/90 border border-cyan-200 focus:ring-2 focus:ring-cyan-400 focus:outline-none"
+            className="mt-2 p-3 w-full rounded-lg bg-[#1A202C]/70 border border-[#27AE60]/30 text-[#E6E6EA] placeholder-[#A0AEC0] focus:ring-2 focus:ring-[#2ECC71] focus:outline-none transition-all"
           />
           {weather && (
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }} 
               animate={{ opacity: 1, scale: 1 }}
-              className="mt-3 text-center"
+              className="mt-4 text-center"
             >
               <img src={weatherIcon} alt="Weather" className="mx-auto w-12 h-12" />
-              <p className="text-sm capitalize">{weather.weather[0].description}</p>
-              <p className="text-xl font-semibold">{weather.main.temp}°C</p>
+              <p className="text-sm capitalize text-[#E6E6EA]">{weather.weather[0].description}</p>
+              <p className="text-2xl font-semibold text-[#27AE60]">{weather.main.temp}°C</p>
             </motion.div>
           )}
         </motion.div>
@@ -265,47 +270,46 @@ const Dashboard = () => {
 
       {/* Main Grid */}
       <motion.div 
-        className="grid grid-cols-1 md:grid-cols-3 gap-8"
+        className="grid grid-cols-1 md:grid-cols-3 gap-6"
         variants={containerVariants}
       >
         {/* Left Column */}
-        <div className="space-y-8">
+        <div className="space-y-6">
           <motion.div 
             variants={itemVariants} 
-            className="p-6 bg-purple-100/80 rounded-2xl shadow-lg border border-purple-200 backdrop-blur-sm"
+            className="p-6 bg-[#2D3748]/80 backdrop-blur-lg rounded-2xl shadow-lg border border-[#27AE60]/20 hover:shadow-xl transition-shadow"
           >
-            <h3 className="font-bold text-xl text-purple-800">Total Earnings</h3>
-            <p className="text-4xl font-semibold text-purple-900 mt-2">₹{randomEarnings()}</p>
+            <h3 className="font-bold text-xl text-[#27AE60]">Total Earnings</h3>
+            <p className="text-4xl font-extrabold text-[#2ECC71] mt-2">₹{randomEarnings()}</p>
           </motion.div>
 
           <motion.div 
             variants={itemVariants} 
-            className="p-6 bg-orange-100/80 rounded-2xl shadow-lg border border-orange-200 backdrop-blur-sm"
+            className="p-6 bg-[#2D3748]/80 backdrop-blur-lg rounded-2xl shadow-lg border border-[#27AE60]/20 hover:shadow-xl transition-shadow"
           >
-            <h3 className="font-bold text-xl text-orange-800">Market Prices</h3>
-            <ul className="mt-2 space-y-1 text-orange-900">
+            <h3 className="font-bold text-xl text-[#27AE60]">Market Prices</h3>
+            <ul className="mt-2 space-y-2">
               {Object.entries(randomPrices()).map(([item, price]) => (
-                <li key={item}>{item}: ₹{price}/kg</li>
+                <li key={item} className="text-sm text-[#E6E6EA]">{item}: <span className="text-[#2ECC71] font-semibold">₹{price}/kg</span></li>
               ))}
             </ul>
           </motion.div>
 
-          {/* Currency Converter */}
           <motion.div 
             variants={itemVariants} 
-            className="p-6 bg-green-100/80 rounded-2xl shadow-lg border border-green-200 backdrop-blur-sm"
+            className="p-6 bg-[#2D3748]/80 backdrop-blur-lg rounded-2xl shadow-lg border border-[#27AE60]/20 hover:shadow-xl transition-shadow"
           >
-            <h3 className="font-bold text-xl text-green-800">Currency Converter</h3>
+            <h3 className="font-bold text-xl text-[#27AE60]">Currency Converter</h3>
             <input 
               type="number" 
               value={amount} 
               onChange={(e) => setAmount(e.target.value)} 
-              className="mt-3 p-2 w-full rounded-lg text-gray-800 bg-white/90 border border-green-200 focus:ring-2 focus:ring-green-400 focus:outline-none"
+              className="mt-3 p-3 w-full rounded-lg bg-[#1A202C]/70 border border-[#27AE60]/30 text-[#E6E6EA] placeholder-[#A0AEC0] focus:ring-2 focus:ring-[#2ECC71] focus:outline-none transition-all"
             />
             <select 
               value={fromCurrency} 
               onChange={(e) => setFromCurrency(e.target.value)} 
-              className="mt-2 p-2 w-full rounded-lg text-gray-800 bg-white/90 border border-green-200 focus:ring-2 focus:ring-green-400 focus:outline-none"
+              className="mt-2 p-3 w-full rounded-lg bg-[#1A202C]/70 border border-[#27AE60]/30 text-[#E6E6EA] focus:ring-2 focus:ring-[#2ECC71] focus:outline-none transition-all"
             >
               <option value="USD">USD</option>
               <option value="INR">INR</option>
@@ -315,7 +319,7 @@ const Dashboard = () => {
             <select 
               value={toCurrency} 
               onChange={(e) => setToCurrency(e.target.value)} 
-              className="mt-2 p-2 w-full rounded-lg text-gray-800 bg-white/90 border border-green-200 focus:ring-2 focus:ring-green-400 focus:outline-none"
+              className="mt-2 p-3 w-full rounded-lg bg-[#1A202C]/70 border border-[#27AE60]/30 text-[#E6E6EA] focus:ring-2 focus:ring-[#2ECC71] focus:outline-none transition-all"
             >
               <option value="INR">INR</option>
               <option value="USD">USD</option>
@@ -323,7 +327,7 @@ const Dashboard = () => {
               <option value="GBP">GBP</option>
             </select>
             {convertedAmount && (
-              <p className="mt-3 text-green-900 font-semibold">
+              <p className="mt-3 text-[#2ECC71] font-semibold">
                 {amount} {fromCurrency} = {convertedAmount} {toCurrency}
               </p>
             )}
@@ -331,15 +335,15 @@ const Dashboard = () => {
         </div>
 
         {/* Center Column */}
-        <div className="space-y-8">
+        <div className="space-y-6">
           <motion.div 
             variants={itemVariants} 
-            className="p-6 bg-blue-100/80 rounded-2xl shadow-lg border border-blue-200 backdrop-blur-sm"
+            className="p-6 bg-[#2D3748]/80 backdrop-blur-lg rounded-2xl shadow-lg border border-[#27AE60]/20 hover:shadow-xl transition-shadow"
           >
-            <h3 className="font-bold text-xl text-blue-800">Sell Surplus</h3>
+            <h3 className="font-bold text-xl text-[#27AE60]">Sell Surplus</h3>
             <Link to="/addpro">
               <motion.button 
-                className="mt-3 px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md"
+                className="mt-3 px-6 py-2 bg-[#2ECC71] text-[#1A202C] rounded-full hover:bg-[#27AE60] shadow-lg transition-all"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -350,45 +354,45 @@ const Dashboard = () => {
 
           <motion.div 
             variants={itemVariants} 
-            className="p-6 bg-yellow-100/80 rounded-2xl shadow-lg border border-yellow-200 backdrop-blur-sm"
+            className="p-6 bg-[#2D3748]/80 backdrop-blur-lg rounded-2xl shadow-lg border border-[#27AE60]/20 hover:shadow-xl transition-shadow"
           >
-            <h3 className="font-bold text-xl text-yellow-800">Crop Recommendation</h3>
-            <p className="mt-2 text-yellow-900 font-medium">Recommended: {randomCropRecommendation()}</p>
+            <h3 className="font-bold text-xl text-[#27AE60]">Crop Recommendation</h3>
+            <p className="mt-2 text-[#2ECC71] font-medium">Recommended: {randomCropRecommendation()}</p>
           </motion.div>
 
           <motion.div 
             variants={itemVariants} 
-            className="p-6 bg-red-100/80 rounded-2xl shadow-lg border border-red-200 backdrop-blur-sm hover:shadow-xl transition-shadow cursor-pointer"
+            className="p-6 bg-[#2D3748]/80 backdrop-blur-lg rounded-2xl shadow-lg border border-[#27AE60]/20 hover:shadow-xl transition-shadow cursor-pointer"
             onClick={() => setFullScreenGraph("orders")}
           >
-            <h3 className="font-bold text-xl text-red-800">Orders Graph</h3>
-            <div className="mt-3 h-40">
+            <h3 className="font-bold text-xl text-[#27AE60]">Orders Graph</h3>
+            <div className="mt-3 h-48">
               <Bar data={generateOrdersData()} options={chartOptions} />
             </div>
           </motion.div>
         </div>
 
         {/* Right Column */}
-        <div className="space-y-8">
+        <div className="space-y-6">
           <motion.div 
             variants={itemVariants} 
-            className="p-6 bg-indigo-100/80 rounded-2xl shadow-lg border border-indigo-200 backdrop-blur-sm"
+            className="p-6 bg-[#2D3748]/80 backdrop-blur-lg rounded-2xl shadow-lg border border-[#27AE60]/20 hover:shadow-xl transition-shadow"
           >
-            <h3 className="font-bold text-xl text-indigo-800">Your Products</h3>
-            <ul className="mt-2 space-y-1 text-indigo-900">
-              <li>Carrots: 50kg</li>
-              <li>Tomatoes: 30kg</li>
-              <li>Apples: 20kg</li>
+            <h3 className="font-bold text-xl text-[#27AE60]">Your Products</h3>
+            <ul className="mt-2 space-y-2">
+              <li className="text-sm text-[#E6E6EA]">Carrots: <span className="text-[#2ECC71] font-semibold">50kg</span></li>
+              <li className="text-sm text-[#E6E6EA]">Tomatoes: <span className="text-[#2ECC71] font-semibold">30kg</span></li>
+              <li className="text-sm text-[#E6E6EA]">Apples: <span className="text-[#2ECC71] font-semibold">20kg</span></li>
             </ul>
           </motion.div>
 
           <motion.div 
             variants={itemVariants} 
-            className="p-6 bg-teal-100/80 rounded-2xl shadow-lg border border-teal-200 backdrop-blur-sm hover:shadow-xl transition-shadow cursor-pointer"
+            className="p-6 bg-[#2D3748]/80 backdrop-blur-lg rounded-2xl shadow-lg border border-[#27AE60]/20 hover:shadow-xl transition-shadow cursor-pointer"
             onClick={() => setFullScreenGraph("analytics")}
           >
-            <h3 className="font-bold text-xl text-teal-800">Analytics</h3>
-            <div className="mt-3 h-40">
+            <h3 className="font-bold text-xl text-[#27AE60]">Analytics</h3>
+            <div className="mt-3 h-48">
               <Pie data={generateAnalyticsData()} options={pieOptions} />
             </div>
           </motion.div>
@@ -396,7 +400,7 @@ const Dashboard = () => {
           {/* Additional Farmer Features */}
           <motion.div variants={itemVariants} className="space-y-3">
             <motion.button 
-              className="w-full px-5 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 shadow-md"
+              className="w-full px-6 py-3 bg-[#2ECC71] text-[#1A202C] rounded-full hover:bg-[#27AE60] shadow-lg transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => alert("Soil testing info")}
@@ -404,7 +408,7 @@ const Dashboard = () => {
               Soil Testing
             </motion.button>
             <motion.button 
-              className="w-full px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md"
+              className="w-full px-6 py-3 bg-[#2ECC71] text-[#1A202C] rounded-full hover:bg-[#27AE60] shadow-lg transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => alert("Market trends")}
@@ -412,7 +416,7 @@ const Dashboard = () => {
               Market Trends
             </motion.button>
             <motion.button 
-              className="w-full px-5 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 shadow-md"
+              className="w-full px-6 py-3 bg-[#2ECC71] text-[#1A202C] rounded-full hover:bg-[#27AE60] shadow-lg transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => alert("Farming tips")}
@@ -424,6 +428,5 @@ const Dashboard = () => {
       </motion.div>
     </motion.div>
   );
-};
-
+}
 export default Dashboard;
