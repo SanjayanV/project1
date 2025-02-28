@@ -4,7 +4,7 @@ import ProductSelection from "./Components/ProductSelection.jsx";
 
 function App(){
   return (
-    <><><title>PLATFORM FOR FARMERS TO SELL </title></><Router>
+    <><><title>FARMER TO CONSUMER PLATFORM</title></><Router>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/addpro" element={<ProductSelection />} />

@@ -1,4 +1,0 @@
-framer-motion (imported by /home/sanjayan/Desktop/react/vite-project/src/Components/ProductSelection.jsx)
-  chart.js (imported by /home/sanjayan/Desktop/react/vite-project/src/Components/Dashboard.jsx)
-  lucide-react (imported by /home/sanjayan/Desktop/react/vite-project/src/Components/ProductSelection.jsx)
-  react-chartjs-2 (imported by /home/sanjayan/Desktop/react/vite-project/src/Components/Dashboard.jsx)

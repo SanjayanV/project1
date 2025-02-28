@@ -18,24 +18,15 @@ dotenv.config();
 app.use(cookieParser()); 
 
 app.use(express.urlencoded({ extended: true })); // Allow form data
-
-const corsOptions = {
-    origin: "http://localhost:3000", // Match your frontend
-    credentials: true,
-    optionsSuccessStatus: 200,
-  };
   
 app.use(cors(corsOptions));
 app.use(express.json());
 
-
-//endpoints
 app.use("/api/user", userRoutes);
 app.use("/api/products",productRoute);
 
 
 app.listen(PORT,()=>{console.log(`Server started at http://localhost:${PORT}`)});
 connectDB();
-console.log(process.env)
 
 
