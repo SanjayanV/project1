@@ -210,7 +210,7 @@ const Dashboard = () => {
               Hello, Farmer!
             </motion.h1>
             <motion.button 
-              className="mt-3 px-6 py-2 bg-[#2ECC71] text-[#1A202C] rounded-full hover:bg-[#27AE60] shadow-lg transition-all"
+              className="mt-3 px-6 py-2 bg-[#2ECC71] text-[#1A202C] rounded-[7px] hover:bg-[#27AE60] shadow-lg transition-all"
               onClick={() => setShowSettings(!showSettings)} 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -343,7 +343,7 @@ const Dashboard = () => {
             <h3 className="font-bold text-xl text-[#27AE60]">Sell Surplus</h3>
             <Link to="/addpro">
               <motion.button 
-                className="mt-3 px-6 py-2 bg-[#2ECC71] text-[#1A202C] rounded-full hover:bg-[#27AE60] shadow-lg transition-all"
+                className="mt-3 px-6 py-2 bg-[#2ECC71] text-[#1A202C] rounded-[7px] hover:bg-[#27AE60] shadow-lg transition-all"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -400,7 +400,7 @@ const Dashboard = () => {
           {/* Additional Farmer Features */}
           <motion.div variants={itemVariants} className="space-y-3">
             <motion.button 
-              className="w-full px-6 py-3 bg-[#2ECC71] text-[#1A202C] rounded-full hover:bg-[#27AE60] shadow-lg transition-all"
+              className="w-full px-6 py-3 bg-[#2ECC71] text-[#1A202C] rounded-[8px] hover:bg-[#27AE60] shadow-lg transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => alert("Soil testing info")}
@@ -408,7 +408,7 @@ const Dashboard = () => {
               Soil Testing
             </motion.button>
             <motion.button 
-              className="w-full px-6 py-3 bg-[#2ECC71] text-[#1A202C] rounded-full hover:bg-[#27AE60] shadow-lg transition-all"
+              className="w-full px-6 py-3 bg-[#2ECC71] text-[#1A202C] rounded-[8px] hover:bg-[#27AE60] shadow-lg transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => alert("Market trends")}
@@ -416,7 +416,7 @@ const Dashboard = () => {
               Market Trends
             </motion.button>
             <motion.button 
-              className="w-full px-6 py-3 bg-[#2ECC71] text-[#1A202C] rounded-full hover:bg-[#27AE60] shadow-lg transition-all"
+              className="w-full px-6 py-3 bg-[#2ECC71] text-[#1A202C] rounded-[8px] hover:bg-[#27AE60] shadow-lg transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => alert("Farming tips")}

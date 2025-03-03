@@ -3,6 +3,36 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import Joi from "joi";
 
+// Define loginSchema
+const loginSchema = Joi.object({
+  email: Joi.string().email().required().messages({
+    'string.email': 'Invalid email format',
+    'any.required': 'Email is required',
+  }),
+  password: Joi.string().min(6).required().messages({
+    'string.min': 'Password must be at least 6 characters long',
+    'any.required': 'Password is required',
+  }),
+});
+
+// Define registerSchema (if not already defined)
+const registerSchema = Joi.object({
+  name: Joi.string().required().messages({
+    'any.required': 'Name is required',
+  }),
+  email: Joi.string().email().required().messages({
+    'string.email': 'Invalid email format',
+    'any.required': 'Email is required',
+  }),
+  password: Joi.string().min(6).required().messages({
+    'string.min': 'Password must be at least 6 characters long',
+    'any.required': 'Password is required',
+  }),
+  role: Joi.string().valid('user', 'admin').default('user').messages({
+    'any.only': 'Role must be either "user" or "admin"',
+  }),
+});
+
 export const register = async (req, res) => {
   const { error } = registerSchema.validate(req.body);
   if (error) return res.status(400).json({ message: error.details[0].message });
@@ -24,7 +54,7 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { error } = loginSchema.validate(req.body);
+  const { error } = loginSchema.validate(req.body); // Now loginSchema is defined
   if (error) return res.status(400).json({ message: error.details[0].message });
 
   try {
@@ -58,4 +88,4 @@ export const logout = (req, res) => {
   res.clearCookie("token");
   console.log(`User logged out: ${req.user.email}`);
   res.json({ message: "Logged out successfully" });
-};  
+};

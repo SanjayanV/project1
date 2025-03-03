@@ -19,7 +19,7 @@ app.use(cookieParser());
 
 app.use(express.urlencoded({ extended: true })); // Allow form data
   
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 
 app.use("/api/user", userRoutes);
