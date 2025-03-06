@@ -1,10 +1,23 @@
 import Product from "../models/product.model.js";
-
+import Bill from "../models/bill.model.js";
 export const addProduct = async (req, res) => {
   try {
-    const { name, description, price, stock, category, image } = req.body;
+    const { name, description, price, stock, category, image, products } = req.body;
     const farmer = req.user.id;
 
+    // If products array is provided, save it as a bill
+    if (products && Array.isArray(products)) {
+      const newBill = new Bill({
+        farmerId: farmer,
+        products,
+        createdAt: new Date(),
+      });
+
+      await newBill.save();
+      return res.status(201).json({ message: "Bill added successfully", bill: newBill });
+    }
+
+    // Otherwise, add a single product
     const newProduct = await Product.create({ farmer, name, description, price, stock, category, image });
     res.status(201).json({ message: "Product added successfully", product: newProduct });
   } catch (error) {

@@ -1,110 +1,100 @@
 import React, { useState } from "react";
-import {
-  auth,
-  provider,
-  signInWithPopup,
-  sendPasswordResetEmail,
-  createUserWithEmailAndPassword,
-  sendEmailVerification,
-  signInWithEmailAndPassword
-} from "../firebase.js";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import "../login.css"; 
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [view, setView] = useState("login"); // login, register, forgotPassword
+  const [credentials, setCredentials] = useState({ email: "", password: "" });
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  // Google Sign-In
-  const handleGoogleLogin = async () => {
-    try {
-      const result = await signInWithPopup(auth, provider);
-      toast.success("Login Successful!");
-    } catch (error) {
-      toast.error(error.message);
-    }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setCredentials((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Email Registration with Verification
-  const handleRegister = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      await sendEmailVerification(userCredential.user);
-      toast.success("Verification email sent! Please verify before logging in.");
-      setView("login"); // Switch back to login screen
+      console.log("Sending credentials:", credentials); // Debug
+      const response = await axios.post(
+        "http://localhost:5000/api/user/login",
+        credentials,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          timeout: 5000,
+        }
+      );
+      console.log("Response:", response.data); // Debug
+      setError(null);
+      navigate("/");
     } catch (error) {
-      toast.error(error.message);
-    }
-  };
-
-  // Login with Email & Password
-  const handleLogin = async () => {
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      if (userCredential.user.emailVerified) {
-        toast.success("Login Successful!");
-      } else {
-        toast.warning("Please verify your email before logging in.");
-      }
-    } catch (error) {
-      toast.error(error.message);
-    }
-  };
-
-  // Password Reset Function
-  const handleForgotPassword = async () => {
-    try {
-      await sendPasswordResetEmail(auth, email);
-      toast.success("Password reset link sent to your email.");
-      setView("login"); // Switch back to login screen
-    } catch (error) {
-      toast.error(error.message);
+      console.error("Login failed:", {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message,
+      });
+      setError(
+        error.response?.data?.message || "Login failed due to a network or server error"
+      );
     }
   };
 
   return (
-    <div className="login-container">
-      <ToastContainer position="top-center" autoClose={3000} />
-
-      <div className="login-box">
-        {view === "login" && (
-          <>
-            <h2>Zero Hunger & Sustainable Agriculture</h2>
-            <p className="tagline">One App, Endless Possibilities!</p>
-            <input type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} />
-            <input type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} />
-            
-            <div className="buttons">
-              <button className="login-btn" onClick={handleLogin}>Login as Farmer</button>
-              <button className="login-btn" onClick={handleLogin}>Login as Consumer</button>
-            </div>
-
-            <button className="google-btn" onClick={handleGoogleLogin}>Sign in with Google</button>
-            <p className="switch-text" onClick={() => setView("register")}>New User? Register</p>
-            <p className="switch-text" onClick={() => setView("forgotPassword")}>Forgot Password?</p>
-          </>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-2xl font-bold text-green-700 text-center mb-6">
+          Farmer Login
+        </h2>
+        {error && (
+          <p className="text-red-500 text-center mb-4">{error}</p>
         )}
-
-        {view === "register" && (
-          <>
-            <h2>Create an Account</h2>
-            <input type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} />
-            <input type="password" placeholder="Enter a strong password" value={password} onChange={(e) => setPassword(e.target.value)} />
-            <button className="register-btn" onClick={handleRegister}>Register</button>
-            <p className="switch-text" onClick={() => setView("login")}>Already have an account? Login</p>
-          </>
-        )}
-
-        {view === "forgotPassword" && (
-          <>
-            <h2>Reset Password</h2>
-            <input type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} />
-            <button className="forgot-btn" onClick={handleForgotPassword}>Send Reset Link</button>
-            <p className="switch-text" onClick={() => setView("login")}>Back to Login</p>
-          </>
-        )}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={credentials.email}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="Enter your email"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={credentials.password}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="Enter your password"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition duration-300"
+          >
+            Login
+          </button>
+        </form>
+        <p className="text-center text-gray-600 mt-4">
+          Don't have an account?{" "}
+          <a href="/register" className="text-green-600 hover:underline">
+            Sign up
+          </a>
+        </p>
       </div>
     </div>
   );

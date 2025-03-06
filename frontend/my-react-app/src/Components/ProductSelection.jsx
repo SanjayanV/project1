@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // Changed from Link to useNavigate
 import { Mic, User, Settings, LogOut } from "lucide-react";
 
 // Product Data with Categories (fixed prices to be consistent numbers)
@@ -67,9 +67,11 @@ const products = [
     { id: 63, name: "Beetroot", tamilName:"பீட்ரூட்" , category: "Vegetables" , weight: "1kg", price: "140", image: "https://www.fitterfly.com/blog/wp-content/uploads/2022/09/Is-Beetroot-Good-for-Diabetes-2.webp" },
     { id: 64, name: "Celery", tamilName:"செலரி" , category: "Herbs" , weight: "1kg", price: "160", image: "https://cdn.britannica.com/68/143768-050-108B71EC/Celery.jpg" },
     { id: 65, name: "Brussels Sprouts", tamilName:"புருசெல்ஸ் முளைகள்" , category: "Herbs" ,  weight: "1kg", price: "250", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3RPU-SU7J8vgl7dSEkLGCRCjMXTH0312AjQ&s" }  
+  // ... (remaining products unchanged for brevity, ensure all categories are correct)
 ];
 
 const ProductSelection = () => {
+  const navigate = useNavigate(); // Added for navigation
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [billList, setBillList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -79,7 +81,7 @@ const ProductSelection = () => {
   const [isListening, setIsListening] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  const [farmerInfo, setFarmerInfo] = useState({ name: "John Doe", email: "john@example.com" });
+  const [farmerInfo] = useState({ name: "John Doe", email: "john@example.com" });
 
   // Voice Recognition Setup
   useEffect(() => {
@@ -165,7 +167,7 @@ const ProductSelection = () => {
     Seeds: billList.filter((item) => item.category === "Seeds"),
     Fertilizers: billList.filter((item) => item.category === "Fertilizers"),
     Herbs: billList.filter((item) => item.category === "Herbs"),
-    "Dairy Products": billList.filter((item) => item.category === "Dairy Products"), // Fixed key
+    "Dairy Products": billList.filter((item) => item.category === "Dairy Products"),
   };
 
   const totalAmount = billList.reduce((sum, item) => sum + Number(item.finalPrice), 0);
@@ -173,17 +175,17 @@ const ProductSelection = () => {
   // Animation Variants
   const pageVariants = {
     initial: { opacity: 0, scale: 0.95 },
-    animate: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: "easeOut", staggerChildren: 0.1 } }
+    animate: { opacity: 1, scale: 1, transition: { duration: 0.8, ease: "easeOut", staggerChildren: 0.1 } },
   };
 
   const containerVariants = {
     hidden: { opacity: 0, y: 50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut", when: "beforeChildren", staggerChildren: 0.1 } }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut", when: "beforeChildren", staggerChildren: 0.1 } },
   };
 
   const itemVariants = {
     hidden: { opacity: 0, scale: 0.9, y: 20 },
-    visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+    visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
   };
 
   return (
@@ -194,10 +196,7 @@ const ProductSelection = () => {
       animate="animate"
     >
       {/* Header */}
-      <motion.header
-        className="flex justify-between items-center mb-8 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-lg"
-        variants={containerVariants}
-      >
+      <motion.header className="flex justify-between items-center mb-8 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-lg" variants={containerVariants}>
         <div className="flex items-center space-x-4">
           <motion.img
             src="https://i.pinimg.com/736x/a8/f4/6a/a8f46ad882c293af8c3fe011ce13bbb0.jpg"
@@ -210,23 +209,13 @@ const ProductSelection = () => {
           </h1>
         </div>
         <div className="flex items-center space-x-4">
-          <motion.button
-            onClick={() => setShowSettings(!showSettings)}
-            className="p-2 bg-teal-100 rounded-full hover:bg-teal-200"
-            whileHover={{ scale: 1.1 }}
-          >
+          <motion.button onClick={() => setShowSettings(!showSettings)} className="p-2 bg-teal-100 rounded-full hover:bg-teal-200" whileHover={{ scale: 1.1 }}>
             <Settings className="w-6 h-6 text-teal-800" />
           </motion.button>
-          <motion.button
-            className="p-2 bg-teal-100 rounded-full hover:bg-teal-200"
-            whileHover={{ scale: 1.1 }}
-          >
+          <motion.button className="p-2 bg-teal-100 rounded-full hover:bg-teal-200" whileHover={{ scale: 1.1 }}>
             <User className="w-6 h-6 text-teal-800" />
           </motion.button>
-          <motion.button
-            className="p-2 bg-red-100 rounded-full hover:bg-red-200"
-            whileHover={{ scale: 1.1 }}
-          >
+          <motion.button className="p-2 bg-red-100 rounded-full hover:bg-red-200" whileHover={{ scale: 1.1 }}>
             <LogOut className="w-6 h-6 text-red-800" />
           </motion.button>
         </div>
@@ -234,28 +223,17 @@ const ProductSelection = () => {
 
       {/* Settings Dropdown */}
       {showSettings && (
-        <motion.div
-          className="absolute top-20 right-6 p-4 bg-white rounded-2xl shadow-xl z-10"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+        <motion.div className="absolute top-20 right-6 p-4 bg-white rounded-2xl shadow-xl z-10" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="space-y-3">
             <div>
               <p className="font-semibold text-teal-800">{farmerInfo.name}</p>
               <p className="text-sm text-gray-600">{farmerInfo.email}</p>
             </div>
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="w-full p-2 rounded-lg border border-teal-200"
-            >
+            <select value={language} onChange={(e) => setLanguage(e.target.value)} className="w-full p-2 rounded-lg border border-teal-200">
               <option value="English">English</option>
               <option value="Tamil">தமிழ்</option>
             </select>
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="w-full p-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
-            >
+            <button onClick={() => setDarkMode(!darkMode)} className="w-full p-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700">
               {darkMode ? "Light Mode" : "Dark Mode"}
             </button>
           </div>
@@ -333,7 +311,7 @@ const ProductSelection = () => {
                       Seeds: "விதைகள்",
                       "Dairy Products": "பால் பொருட்கள்",
                       Fertilizers: "உரங்கள்",
-                      Herbs: "மூலிகைகள்"
+                      Herbs: "மூலிகைகள்",
                     }[category]}
                   </h3>
                   {categorizedBill[category].map((item) => (
@@ -360,10 +338,7 @@ const ProductSelection = () => {
                           min="1"
                         />
                         <p className="text-teal-700 font-medium">₹{item.finalPrice}</p>
-                        <button
-                          onClick={() => removeItem(item.id)}
-                          className="text-red-600 hover:text-red-800"
-                        >
+                        <button onClick={() => removeItem(item.id)} className="text-red-600 hover:text-red-800">
                           ✕
                         </button>
                       </div>
@@ -378,6 +353,15 @@ const ProductSelection = () => {
             <p className="text-2xl font-bold text-teal-800 text-right">
               {language === "English" ? "Total" : "மொத்தம்"}: ₹{totalAmount}
             </p>
+            <motion.button
+              onClick={() => navigate("/payment", { state: { billList, totalAmount } })}
+              className="mt-4 w-full py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 shadow-md"
+              variants={itemVariants}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {language === "English" ? "Proceed to Payment" : "பணம் செலுத்துதலுக்கு செல்"}
+            </motion.button>
           </motion.div>
         )}
 
@@ -392,28 +376,15 @@ const ProductSelection = () => {
               type="text"
               value={newDispute}
               onChange={(e) => setNewDispute(e.target.value)}
-              placeholder={language === "English" ? "Enter your query..." : "உங்கள் கேள்வியை உள்ளிடவும்..."}
+              placeholder={language === "English" ? "Reply to query..." : "வாடிக்கையாளர்களின் கேள்விக்கு பதில்..."}
               className="w-full p-3 rounded-lg border border-teal-200 mb-3"
             />
-            <button
-              onClick={addDispute}
-              className="w-full p-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
-            >
+            <button onClick={addDispute} className="w-full p-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700">
               {language === "English" ? "Submit" : "சமர்ப்பி"}
             </button>
             {disputes.map((dispute, index) => (
               <p key={index} className="mt-2 text-teal-700">{dispute}</p>
             ))}
-          </div>
-
-          {/* Weather Widget (Placeholder) */}
-          <div className="p-6 bg-white/90 rounded-2xl shadow-lg">
-            <h2 className="text-xl font-bold text-teal-800 mb-4">
-              {language === "English" ? "Weather Info" : "வானிலை தகவல்"}
-            </h2>
-            <p className="text-teal-700">
-              {language === "English" ? "Weather data coming soon..." : "வானிலை தரவு விரைவில் வரும்..."}
-            </p>
           </div>
         </motion.div>
       </motion.div>
