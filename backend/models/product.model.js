@@ -1,16 +1,13 @@
+// models/product.model.js
 import mongoose from "mongoose";
 
-const productSchema = new mongoose.Schema(
-  {
-    farmer: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    name: { type: String, required: true },
-    description: { type: String },
-    price: { type: Number, required: true },
-    stock: { type: Number, required: true },
-    category: { type: String },
-    image: { type: String },
-  },
-  { timestamps: true }
-);
+const productSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  quantity: { type: Number, required: true },
+  price: { type: Number, required: true },
+  farmerId: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null }, // Optional if auth is removed
+  createdAt: { type: Date, default: Date.now },
+});
 
-export default mongoose.model("Product", productSchema);
+const Product = mongoose.model("Product", productSchema);
+export default Product;

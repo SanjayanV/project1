@@ -27,10 +27,17 @@ export const addProduct = async (req, res) => {
 
 export const getProducts = async (req, res) => {
   try {
-    const products = await Product.find().populate("farmer", "name");
-    res.json(products);
+    const farmerId = req.user.uid; // Firebase UID from token
+    const snapshot = await db.ref(`products/${farmerId}`).once("value");
+    const products = snapshot.val() || {};
+    const productList = Object.keys(products).map((key) => ({
+      id: key,
+      ...products[key],
+    }));
+    res.json(productList);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error fetching products:", error);
+    res.status(500).json({ error: "Server error" });
   }
 };
 
@@ -55,18 +62,16 @@ export const deleteProduct = async (req, res) => {
   }
 };
 
+
 export const saveProduct = async (req, res) => {
   try {
-    const { products } = req.body; // Array of selected products
-    const farmerId = req.user.id; // Farmer's ID from the token
-
-    // Save products to the database
-    const savedProducts = await Product.insertMany(
-      products.map((product) => ({ ...product, farmer: farmerId }))
-    );
-
-    res.status(201).json({ message: "Products saved successfully", products: savedProducts });
+    const farmerId = req.user.uid;
+    const { name, price, stock, image } = req.body;
+    const newProductRef = db.ref(`products/${farmerId}`).push();
+    await newProductRef.set({ name, price, stock, image });
+    res.status(201).json({ message: "Product added", id: newProductRef.key });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error adding product:", error);
+    res.status(500).json({ error: "Server error" });
   }
-}
+};

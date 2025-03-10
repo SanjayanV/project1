@@ -1,7 +1,7 @@
 import express from "express";
 import { register, login, logout } from "../controllers/user.controller.js";
 import { verifyToken } from "../middlewares/auth.js";
-import { authMiddleware } from "../middlewares/authMiddleware.js";
+import { protect } from "../middlewares/authMiddleware.js";
 import Joi from "joi"; // Import Joi
 
 const router = express.Router();
@@ -40,7 +40,7 @@ router.get("/protected", verifyToken, (req, res) => {
   res.json({ message: "Access granted", user: req.user });
 });
 
-router.get("/debug-token", authMiddleware, (req, res) => {
+router.get("/debug-token", protect, (req, res) => {
   res.json({ userId: req.user.id });
 });
 

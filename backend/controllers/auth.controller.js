@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import admin from "firebase-admin";
 import User from "../models/user.model.js";
+import jwt from "jsonwebtoken";
 
 const serviceAccount = await import("../serviceAccountKey.json", { assert: { type: "json" } });
 admin.initializeApp({
@@ -34,69 +35,84 @@ export const signup = async (req, res) => {
 };
 
 export const signin = async (req, res) => {
-  const { email, password, role } = req.body;
-
-  if (!email || !password || !role) {
-    return res.status(400).json({ error: "Email, password, and role are required" });
-  }
-  if (!["farmer", "consumer"].includes(role)) {
-    return res.status(400).json({ error: "Invalid role. Must be 'farmer' or 'consumer'" });
-  }
-
+  const { email, password, role } = req.body; // Destructure from req.body
   try {
-    const user = await User.findOne({ email });
-    if (!user || !user.password) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
-    if (user.role !== role) {
-      return res.status(403).json({ error: "Role does not match account" });
+    // Validate inputs
+    if (!email || !password || !role) {
+      return res.status(400).json({ error: "Email, password, and role are required" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
+    const user = await User.findOne({ email, role }); // Use destructured email
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    res.status(200).json({ message: "Signin successful", user: { email, name: user.name, role: user.role } });
+    const token = jwt.sign({ _id: user._id, role: user.role }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    res.json({
+      token,
+      user: {
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
+      message: "Signin successful!",
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Signin error:", error);
+    res.status(500).json({ error: "Server error" });
   }
 };
 
+
 export const syncGoogleUser = async (req, res) => {
-  const { uid, email, name, role } = req.body;
-
-  if (!uid || !email || !name || !role) {
-    return res.status(400).json({ error: "All fields are required" });
-  }
-  if (!["farmer", "consumer"].includes(role)) {
-    return res.status(400).json({ error: "Invalid role. Must be 'farmer' or 'consumer'" });
-  }
-
   try {
-    const user = await User.findOneAndUpdate(
-      { uid },
-      { uid, email, name, role },
-      { upsert: true, new: true }
+    const { uid, email, name: displayName, role } = req.body;
+    let user = await User.findOne({ uid });
+    if (!user) {
+      user = new User({ uid, email, name: displayName, role });
+      await user.save();
+    } else {
+      user.name = displayName; // Update name if it exists
+      user.role = role; // Update role if needed
+      await user.save();
+    }
+    const token = jwt.sign(
+      { _id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
     );
-    res.status(200).json({ message: "Google user synced", user });
+    res.json({ token, message: "User synced successfully" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Sync-google-user error:", error);
+    res.status(500).json({ error: "Server error" });
   }
 };
 
 // New endpoint to check if user exists
 export const checkUserExists = async (req, res) => {
-  const { uid } = req.body;
-
-  if (!uid) {
-    return res.status(400).json({ error: "UID is required" });
-  }
-
   try {
-    const user = await User.findOne({ uid });
-    res.status(200).json({ exists: !!user, user });
+    const { uid } = req.body;
+    let user = await User.findOne({ uid });
+    if (user) {
+      const token = jwt.sign(
+        { _id: user._id, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+      );
+      res.json({
+        exists: true,
+        token,
+        role: user.role,
+        ...user.toObject(),
+      });
+    } else {
+      res.json({ exists: false });
+    }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Check-user error:", error);
+    res.status(500).json({ error: "Server error" });
   }
 };

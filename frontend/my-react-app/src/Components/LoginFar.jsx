@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
 import { auth, provider, signInWithPopup } from "../firebase.js";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
-const Loginfar = () => {
+const Loginfar = ({ setAuth }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -25,18 +24,26 @@ const Loginfar = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       const checkData = { uid: user.uid };
+      
       const response = await axios.post("http://localhost:5000/api/auth/check-user", checkData);
-      console.log(response);
   
+      
       if (response.data.exists) {
-        // Assuming backend returns user details including { token, role, ...otherDetails }
         const { token, role: userRole, ...userDetails } = response.data;
-        console.log(role)
+        if (!token || typeof token !== "string") {
+          throw new Error("Invalid or missing token from server");
+        }
+        
         localStorage.setItem("token", token);
         localStorage.setItem("role", userRole);
-        localStorage.setItem("userDetails", JSON.stringify(userDetails)); // Store other user details if needed
+        localStorage.setItem("userDetails", JSON.stringify(userDetails)); // Optional
+        
         toast.success("Login Successful!");
-        navigate(role === "farmer" ? "/dashboard" : "/home");
+        setAuth(true);
+        // Delay navigation to ensure localStorage is updated
+        setTimeout(() => {
+          navigate(userRole === "farmer" ? "/dashboard" : "/home");
+        }, 100); // Small delay to ensure storage
       } else {
         setGoogleUser({
           uid: user.uid,
@@ -45,6 +52,7 @@ const Loginfar = () => {
         });
       }
     } catch (error) {
+      console.error("Google login error:", error.response?.data || error.message);
       toast.error(error.response?.data?.error || error.message);
     }
   };
@@ -54,7 +62,7 @@ const Loginfar = () => {
       toast.error("Role is required for Google sign-up!");
       return;
     }
-    try {
+    try {f
       const userData = { ...googleUser, role };
       const response = await axios.post("http://localhost:5000/api/auth/sync-google-user", userData);
       // Assuming backend returns { token, message }
@@ -63,35 +71,42 @@ const Loginfar = () => {
       localStorage.setItem("role", role); // Store selected role
       toast.success(response.data.message || "Sign-up Successful!");
       setGoogleUser(null);
+      setAuth(true); // Set authentication state to true
       navigate(role === "farmer" ? "/dashboard" : "/home");
-      console.log(role)
     } catch (error) {
       toast.error(error.response?.data?.error || error.message);
       setGoogleUser(null);
     }
   };
 
-  const handleLogin = async () => {
-    if (!email || !password || !role) {
-      toast.error("Email, Password, and Role are required!");
-      return;
+const handleLogin = async () => {
+  if (!email || !password || !role) {
+    toast.error("Email, Password, and Role are required!");
+    return;
+  }
+  try {
+    const response = await axios.post("http://localhost:5000/api/auth/signin", {
+      email,
+      password,
+      role,
+    });
+
+    const { token, user } = response.data;
+    if (!token || typeof token !== "string") {
+      throw new Error("Invalid token received from server");
     }
-    try {
-      const response = await axios.post("http://localhost:5000/api/auth/signin", {
-        email,
-        password,
-        role,
-      });
-      // Assuming backend returns { token, role, message }
-      const { token, role: userRole } = response.data;
-      localStorage.setItem("token", token); // Store token
-      localStorage.setItem("role", userRole || role); // Store role (use backend role if provided)
-      toast.success(response.data.message);
-      navigate(role === "farmer" ? "/dashboard" : "/home");
-    } catch (error) {
-      toast.error(error.response?.data?.error || error.message);
-    }
-  };
+    
+    localStorage.setItem("token", token); // Store the token
+    localStorage.setItem("role", user.role); // Store the role
+    
+    toast.success("Login Successful!");
+    setAuth(true);
+    navigate(role === "farmer" ? "/dashboard" : "/home");
+  } catch (error) {
+    console.error("Login error:", error.response?.data || error.message);
+    toast.error(error.response?.data?.error || "Login failed. Please check your credentials.");
+  }
+};
 
   const handleRegister = async () => {
     if (!email || !password || !confirmPassword || !name || !role) {

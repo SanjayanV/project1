@@ -1,36 +1,38 @@
-import Dashboard from "./Components/Dashboard.jsx";
+import Dashboard from "./Components/Dashboard FInal.jsx";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ProductSelection from "./Components/ProductSelection.jsx";
-import Login from "./Components/Login.jsx"
 import Register from "./Components/Register.jsx";
-import  Home  from "./Components/Home.jsx";
-import {useState} from 'react';
+import Home from "./Components/Home.jsx";
+import { useState } from 'react';
 import Loginfar from "./Components/LoginFar.jsx";
+import PrivateRoute from "./Components/PrivateRoute.jsx";
 
-function App(){
+function App() {
   const [isAuthenticated, setAuth] = useState(false);
 
   return (
-    <><><title>FARMER TO CONSUMER PLATFORM</title></><Router>
-      <Routes>
-        
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Loginfar/>} />
-        <Route path="/signup" element={<Register setAuth={setAuth} />} />
-        <Route
-          path="/dashboard"
-          element={
-            
-              <Dashboard />
-            
-          }/>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/pro" element={<ProductSelection />} />
-        
-        
-      </Routes>
-    </Router></>
-
+    <>
+      <title>FARMER TO CONSUMER PLATFORM</title>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Loginfar setAuth={setAuth} />} /> {/* Pass setAuth here */}
+          <Route path="/signup" element={<Register setAuth={setAuth} />} /> {/* Simplified */}
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute isAuthenticated={isAuthenticated}>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/addproducts" element={<PrivateRoute isAuthenticated={isAuthenticated}>
+                <ProductSelection />
+              </PrivateRoute>} />
+        </Routes>
+      </Router>
+    </>
   );
 }
+
 export default App;
