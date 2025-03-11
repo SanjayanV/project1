@@ -1,5 +1,6 @@
+// routes/FarmerRoute.js
 import express from "express";
-import { protect } from "../middlewares/authMiddleware.js"; // Assuming this exists
+import { protect } from "../middlewares/authMiddleware.js";
 import {
   getEarnings,
   getMarketPrices,

@@ -1,21 +1,22 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth, provider, signInWithPopup } from "../firebase.js";
+import { auth, provider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "../firebase.js";
+import { getDatabase, ref, set, get } from "firebase/database"; // Firebase Realtime Database
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axios from "axios";
 
-const Loginfar = ({ setAuth }) => {
+const Login = ({ setAuth }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
-  const [role, setRole] = useState("farmer"); // Default for email/password forms
+  const [role, setRole] = useState("farmer");
   const [view, setView] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
-  const [googleUser, setGoogleUser] = useState(null); // Store Google user data temporarily
+  const [googleUser, setGoogleUser] = useState(null);
 
   const navigate = useNavigate();
+  const db = getDatabase();
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
@@ -23,28 +24,51 @@ const Loginfar = ({ setAuth }) => {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      const checkData = { uid: user.uid };
-      
-      const response = await axios.post("http://localhost:5000/api/auth/check-user", checkData);
-  
-      
-      if (response.data.exists) {
-        const { token, role: userRole, ...userDetails } = response.data;
-        if (!token || typeof token !== "string") {
-          throw new Error("Invalid or missing token from server");
+
+      console.log("Logged in user:", user.uid, user.email, user.displayName);
+
+      // Check if user exists in Firebase Realtime Database
+      if (!get || typeof get !== "function") {
+        throw new Error("Firebase 'get' function is not available. Check your imports or Firebase setup.");
+      }
+
+      const userRef = ref(db, `users/${user.uid}`);
+      const userSnapshot = await get(userRef);
+
+      console.log("Firebase snapshot exists:", userSnapshot.exists());
+      if (userSnapshot.exists()) {
+        const userData = userSnapshot.val();
+        console.log("User data from Firebase:", userData);
+
+        const userRole = userData.role;
+        if (userRole) {
+          console.log("User role found:", userRole);
+
+          // Use Firebase ID token for authentication
+          const token = await user.getIdToken();
+          localStorage.setItem("token", token);
+          localStorage.setItem("role", userRole);
+          localStorage.setItem("userDetails", JSON.stringify({
+            uid: user.uid,
+            email: user.email,
+            name: userData.name || user.displayName,
+          }));
+
+          toast.success("Login Successful!");
+          setAuth(true);
+          setTimeout(() => {
+            navigate(userRole === "farmer" ? "/dashboard" : "/home");
+          }, 100);
+        } else {
+          console.log("No role found for existing user, prompting role selection");
+          setGoogleUser({
+            uid: user.uid,
+            email: user.email,
+            name: user.displayName || "Google User",
+          });
         }
-        
-        localStorage.setItem("token", token);
-        localStorage.setItem("role", userRole);
-        localStorage.setItem("userDetails", JSON.stringify(userDetails)); // Optional
-        
-        toast.success("Login Successful!");
-        setAuth(true);
-        // Delay navigation to ensure localStorage is updated
-        setTimeout(() => {
-          navigate(userRole === "farmer" ? "/dashboard" : "/home");
-        }, 100); // Small delay to ensure storage
       } else {
+        console.log("New user detected, prompting role selection");
         setGoogleUser({
           uid: user.uid,
           email: user.email,
@@ -52,8 +76,8 @@ const Loginfar = ({ setAuth }) => {
         });
       }
     } catch (error) {
-      console.error("Google login error:", error.response?.data || error.message);
-      toast.error(error.response?.data?.error || error.message);
+      console.error("Google login error:", error.message);
+      toast.error(error.message || "Google login failed");
     }
   };
 
@@ -62,51 +86,62 @@ const Loginfar = ({ setAuth }) => {
       toast.error("Role is required for Google sign-up!");
       return;
     }
-    try {f
+    try {
       const userData = { ...googleUser, role };
-      const response = await axios.post("http://localhost:5000/api/auth/sync-google-user", userData);
-      // Assuming backend returns { token, message }
-      const { token } = response.data;
-      localStorage.setItem("token", token); // Store token
-      localStorage.setItem("role", role); // Store selected role
-      toast.success(response.data.message || "Sign-up Successful!");
+      await set(ref(db, `users/${googleUser.uid}`), {
+        email: googleUser.email,
+        name: googleUser.name,
+        uid: googleUser.uid,
+        role,
+        createdAt: new Date().toISOString(),
+      });
+
+      // Use Firebase ID token
+      const user = auth.currentUser;
+      const token = await user.getIdToken();
+      localStorage.setItem("token", token);
+      localStorage.setItem("role", role);
+
+      toast.success("Sign-up Successful!");
       setGoogleUser(null);
-      setAuth(true); // Set authentication state to true
+      setAuth(true);
       navigate(role === "farmer" ? "/dashboard" : "/home");
     } catch (error) {
-      toast.error(error.response?.data?.error || error.message);
+      console.error("Google sync error:", error.message);
+      toast.error(error.message || "Failed to complete Google sign-up");
       setGoogleUser(null);
     }
   };
 
-const handleLogin = async () => {
-  if (!email || !password || !role) {
-    toast.error("Email, Password, and Role are required!");
-    return;
-  }
-  try {
-    const response = await axios.post("http://localhost:5000/api/auth/signin", {
-      email,
-      password,
-      role,
-    });
-
-    const { token, user } = response.data;
-    if (!token || typeof token !== "string") {
-      throw new Error("Invalid token received from server");
+  const handleLogin = async () => {
+    if (!email || !password) {
+      toast.error("Email and Password are required!");
+      return;
     }
-    
-    localStorage.setItem("token", token); // Store the token
-    localStorage.setItem("role", user.role); // Store the role
-    
-    toast.success("Login Successful!");
-    setAuth(true);
-    navigate(role === "farmer" ? "/dashboard" : "/home");
-  } catch (error) {
-    console.error("Login error:", error.response?.data || error.message);
-    toast.error(error.response?.data?.error || "Login failed. Please check your credentials.");
-  }
-};
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      const userRef = ref(db, `users/${user.uid}`);
+      const snapshot = await get(userRef);
+      if (!snapshot.exists()) {
+        throw new Error("User data not found in database");
+      }
+      const userData = snapshot.val();
+      const userRole = userData.role;
+
+      const token = await user.getIdToken();
+      localStorage.setItem("token", token);
+      localStorage.setItem("role", userRole);
+
+      toast.success("Login Successful!");
+      setAuth(true);
+      navigate(userRole === "farmer" ? "/dashboard" : "/home");
+    } catch (error) {
+      console.error("Login error:", error.message);
+      toast.error(error.message || "Login failed. Please check your credentials.");
+    }
+  };
 
   const handleRegister = async () => {
     if (!email || !password || !confirmPassword || !name || !role) {
@@ -118,21 +153,41 @@ const handleLogin = async () => {
       return;
     }
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/signup", {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      await set(ref(db, `users/${user.uid}`), {
         email,
-        password,
         name,
+        uid: user.uid,
         role,
+        createdAt: new Date().toISOString(),
       });
-      toast.success(response.data.message);
+
+      const token = await user.getIdToken();
+      localStorage.setItem("token", token);
+      localStorage.setItem("role", role);
+
+      toast.success("Sign-up Successful!");
+      setAuth(true);
       setView("login");
     } catch (error) {
-      toast.error(error.response?.data?.error || error.message);
+      console.error("Register error:", error.message);
+      toast.error(error.message || "Sign-up failed");
     }
   };
 
-  const handleForgotPassword = () => {
-    toast.info("Password reset not implemented yet. Contact support.");
+  const handleForgotPassword = async () => {
+    if (!email) {
+      toast.error("Please enter your email first!");
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      toast.success("Password reset email sent!");
+    } catch (error) {
+      toast.error(error.message || "Failed to send reset email");
+    }
   };
 
   return (
@@ -159,7 +214,6 @@ const handleLogin = async () => {
         }`}
       >
         {googleUser ? (
-          // Role selection step for new Google users
           <div className="w-full max-w-sm mt-5">
             <h2 className="text-3xl font-bold">Select Your Role</h2>
             <p className="mt-1 text-gray-500">Please choose your role to complete sign-up.</p>
@@ -205,7 +259,7 @@ const handleLogin = async () => {
             <div className="w-full max-w-sm mt-5">
               <input
                 type="email"
-                placeholder="Your username or email"
+                placeholder="Your email"
                 className="w-full p-3 mb-3 border border-gray-300 rounded-md hover:bg-gray-100"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -229,6 +283,7 @@ const handleLogin = async () => {
                 className="w-full p-3 mb-3 border border-gray-300 rounded-md hover:bg-gray-100"
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
+                disabled // Role is only editable during signup
               >
                 <option value="farmer">Farmer</option>
                 <option value="consumer">Consumer</option>
@@ -339,4 +394,4 @@ const handleLogin = async () => {
   );
 };
 
-export default Loginfar;
+export default Login;

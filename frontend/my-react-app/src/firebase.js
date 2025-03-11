@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail, createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword } from "firebase/auth";
-import {admin} from "firebase-admin";
-// Your Firebase configuration
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
+import { getDatabase } from "firebase/database"; // Import Realtime Database
+
 const firebaseConfig = {
   apiKey: "AIzaSyAzBNj20JCE39AUvRXWoV5VlgNaiL-o_94",
   authDomain: "sendora-9e14f.firebaseapp.com",
@@ -13,15 +13,10 @@ const firebaseConfig = {
   measurementId: "G-HEYHYSGKBL"
 };
 
-// Initialize Firebase
+
+
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount.default),
-});
-export const adminAuth = admin.auth();
-export const adminDb = admin.firestore();
-
-export { auth, provider, signInWithPopup, sendPasswordResetEmail, createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword };
+export const auth = getAuth(app);
+export const provider = new GoogleAuthProvider();
+export const db = getDatabase(app); // Export the database instance
+export { signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail };

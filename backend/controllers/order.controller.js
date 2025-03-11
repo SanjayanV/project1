@@ -1,22 +1,29 @@
-import Order from "../models/Order.js";
+// controllers/orderController.mjs
+import { createOrder, getOrder } from "../models/order.model.js";
+import { getDatabase, ref, get, query, orderByChild, equalTo } from "firebase/database";
+
+const db = getDatabase();
 
 export const createOrder = async (req, res) => {
-  try {
-    const { products, totalAmount } = req.body;
-    const consumer = req.user.id;
+  const { products, totalAmount } = req.body;
+  const consumer = req.user.id; // From middleware
 
-    const newOrder = await Order.create({ consumer, products, totalAmount });
-    res.status(201).json({ message: "Order placed successfully", order: newOrder });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  const result = await createOrder({ consumer, products, totalAmount });
+  if (result.success) {
+    res.status(201).json({ id: result.id });
+  } else {
+    res.status(500).json({ message: "Failed to create order" });
   }
 };
 
 export const getOrders = async (req, res) => {
-  try {
-    const orders = await Order.find({ consumer: req.user.id }).populate("products.product");
+  const ordersRef = ref(db, "orders");
+  const consumerQuery = query(ordersRef, orderByChild("consumer"), equalTo(req.user.id));
+  const snapshot = await get(consumerQuery);
+  if (snapshot.exists()) {
+    const orders = Object.entries(snapshot.val()).map(([id, data]) => ({ id, ...data }));
     res.json(orders);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } else {
+    res.json([]);
   }
 };

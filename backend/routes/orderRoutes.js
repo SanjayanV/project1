@@ -1,3 +1,4 @@
+// routes/orderRoute.js
 import express from "express";
 import { createOrder, getOrders } from "../controllers/orderController.mjs";
 import authMiddleware from "../middlewares/authMiddleware.mjs";

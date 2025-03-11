@@ -1,8 +1,9 @@
+// routes/userRoute.js
 import express from "express";
 import { register, login, logout } from "../controllers/user.controller.js";
 import { verifyToken } from "../middlewares/auth.js";
 import { protect } from "../middlewares/authMiddleware.js";
-import Joi from "joi"; // Import Joi
+import Joi from "joi";
 
 const router = express.Router();
 

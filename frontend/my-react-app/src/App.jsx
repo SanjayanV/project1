@@ -4,7 +4,8 @@ import ProductSelection from "./Components/ProductSelection.jsx";
 import Register from "./Components/Register.jsx";
 import Home from "./Components/Home.jsx";
 import { useState } from 'react';
-import Loginfar from "./Components/LoginFar.jsx";
+import Login from "./Components/Login1.jsx";
+import LoginFar from "./Components/LoginFar.jsx";
 import PrivateRoute from "./Components/PrivateRoute.jsx";
 
 function App() {
@@ -16,7 +17,8 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Loginfar setAuth={setAuth} />} /> {/* Pass setAuth here */}
+          <Route path="/login" element={<Login setAuth={setAuth} />} /> {/* Pass setAuth here */}
+          <Route path="/loginfar" element={<LoginFar setAuth={setAuth} />} /> {/* Pass setAuth here */}
           <Route path="/signup" element={<Register setAuth={setAuth} />} /> {/* Simplified */}
           <Route
             path="/dashboard"

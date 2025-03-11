@@ -1,32 +1,31 @@
+// middlewares/authMiddleware.js
 import jwt from "jsonwebtoken";
 
-export const protect = async (req, res, next) => {
-  let token;
+export const protect = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  console.log("Authorization header:", authHeader); // Debug
 
-  console.log("Authorization header:", req.headers.authorization); // Debug header
-
-  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-    token = req.headers.authorization.split(" ")[1];
-    console.log("Extracted token:", token); // Debug token
-  }
-
-  if (!token) {
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({ error: "Not authorized, no token provided" });
   }
 
+  const token = authHeader.split(" ")[1];
+  console.log("Extracted token:", token); // Debug
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("Decoded token:", decoded); // Debug decoded payload
-    req.user = decoded;
+    console.log("Decoded token (protect):", decoded); // Debug
+    req.user = { id: decoded.id }; // Standardize on 'id'
     next();
   } catch (error) {
-    console.error("Token verification failed:", error.message); // Debug verification error
+    console.error("Token verification failed (protect):", error.message);
     return res.status(401).json({ error: "Not authorized, invalid token" });
   }
 };
+
 export const authMiddleware = (req, res, next) => {
   const token = req.header("Authorization")?.replace("Bearer ", "");
-  console.log("Received token:", token); // Debug log
+  console.log("Received token (authMiddleware):", token); // Debug
 
   if (!token) {
     return res.status(401).json({ message: "No token provided" });
@@ -34,11 +33,11 @@ export const authMiddleware = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("Decoded token:", decoded); // Debug log
-    req.user = { id: decoded._id }; // Use _id instead of id
+    console.log("Decoded token (authMiddleware):", decoded); // Debug
+    req.user = { id: decoded.id }; // Standardize on 'id' (changed from _id)
     next();
   } catch (error) {
-    console.error("Token verification error:", error.message); // Debug log
-    res.status(401).json({ message: "Invalid token", error: error.message });
+    console.error("Token verification error (authMiddleware):", error.message);
+    return res.status(401).json({ message: "Invalid token", error: error.message });
   }
 };

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Mic, User, Settings, LogOut } from "lucide-react";
-import axios from "axios";
+import { auth } from "../firebase.js"; // Firebase Auth
+import { getDatabase, ref, push, set } from "firebase/database"; // Firebase Realtime Database
 
 // Product Data with Categories
 const products = [
@@ -13,8 +14,6 @@ const products = [
   { id: 5, name: "Almond Seeds", weight: "1kg", tamilName: "பாதாம் விதைகள்", category: "Seeds", image: "https://cbx-prod.b-cdn.net/COLOURBOX47480356.jpg?width=800&height=800&quality=70" },
 ];
 
-const API_URL = "http://localhost:5000/api/products";
-
 const ProductSelection = () => {
   const navigate = useNavigate();
   const [selectedProducts, setSelectedProducts] = useState([]);
@@ -24,10 +23,26 @@ const ProductSelection = () => {
   const [isListening, setIsListening] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  const [farmerInfo] = useState({ name: "John Doe", email: "john@example.com" });
+  const [farmerInfo, setFarmerInfo] = useState({ name: "John Doe", email: "john@example.com" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const db = getDatabase(); // Firebase Realtime Database instance
+
+  // Fetch farmer info on mount
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user) {
+      setFarmerInfo({
+        name: user.displayName || "Farmer",
+        email: user.email || "No email",
+      });
+    } else {
+      navigate("/login"); // Redirect to login if not authenticated
+    }
+  }, [navigate]);
+
+  // Speech recognition setup
   useEffect(() => {
     if (!("webkitSpeechRecognition" in window)) return;
     const recognition = new window.webkitSpeechRecognition();
@@ -100,52 +115,62 @@ const ProductSelection = () => {
   const removeItem = (id) => {
     setBillList((prev) => prev.filter((item) => item.id !== id));
   };
+  
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      localStorage.removeItem("userDetails");
+      navigate("/login");
+    } catch (err) {
+      console.error("Logout error:", err.message);
+      setError("Failed to log out.");
+    }
+  };
+
 
   const handleSaveProducts = async () => {
     try {
       setLoading(true);
       setError(null);
-  
-      const productsToSave = billList.map(item => ({
-        name: item.name,
-        quantity: item.qty,
-        price: Number(item.customPrice) || 0,
-      }));
-     
-  
-      const token = localStorage.getItem("token");
-      
-  
-      if (!token) {
+
+      const user = auth.currentUser;
+      if (!user) {
         setError("Please log in to save products");
         navigate("/login");
         return;
       }
-  
-      const response = await axios.post(
-        `${API_URL}/save-products`,
-        { products: productsToSave },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+
+      const productsToSave = billList.map((item) => {
+        const price = Number(item.customPrice);
+        if (isNaN(price) || price <= 0) {
+          throw new Error("All products must have a valid price greater than 0.");
         }
-      );
-  
-      if (response.status === 201) {
-        setBillList([]);
-        alert("Products saved successfully!");
+        return {
+          name: item.name,
+          quantity: item.qty,
+          price,
+          category: item.category,
+          image: item.image,
+          farmerId: user.uid,
+          farmerName: farmerInfo.name,
+          createdAt: new Date().toISOString(),
+        };
+      });
+
+      // Save products to Firebase Realtime Database under the farmer's UID
+      const productsRef = ref(db, `products`);
+      for (const product of productsToSave) {
+        const newProductRef = push(productsRef); // Generate a unique key for each product
+        await set(newProductRef, product);
       }
+
+      setBillList([]);
+      alert("Products saved successfully!");
     } catch (err) {
-      if (err.response?.status === 401) {
-        setError("Unauthorized. Please log in again.");
-        localStorage.removeItem("token");
-        navigate("/login");
-      } else {
-        setError(err.response?.data?.message || "Failed to save products.");
-      }
-      console.error("Error response:", err.response?.data);
+      console.error("Error saving products:", err.message);
+      setError(err.message || "Failed to save products.");
     } finally {
       setLoading(false);
     }
@@ -185,7 +210,7 @@ const ProductSelection = () => {
 
   return (
     <motion.div
-      className={`min-h-screen p-6 font-mont ${darkMode ? "bg-gray-900 text-white" : "bg-gradient-to-br from-[#fdfbfb]  to-[#ebedee] text-black"}`}
+      className={`min-h-screen p-6 font-mont ${darkMode ? "bg-gray-900 text-white" : "bg-gradient-to-br from-[#fdfbfb] to-[#ebedee] text-black"}`}
       variants={pageVariants}
       initial="initial"
       animate="animate"
@@ -209,8 +234,8 @@ const ProductSelection = () => {
           <motion.button className="p-2 bg-gradient-to-br from-[black] to-[#393939] rounded-full hover:bg-teal-200" whileHover={{ scale: 1.1 }}>
             <User className="w-6 h-6 text-green-600" />
           </motion.button>
-          <motion.button className="p-2 bg-gradient-to-br from-[black] to-[#393939] rounded-full hover:bg-red-200" whileHover={{ scale: 1.1 }}>
-            <LogOut className="w-6 h-6 text-red-800" />
+          <motion.button onClick={handleLogout} className="p-2 bg-gradient-to-br from-[black] to-[#393939] rounded-full hover:bg-red-200" whileHover={{ scale: 1.1 }}>
+              <LogOut className="w-6 h-6 text-red-800" />
           </motion.button>
         </div>
       </motion.header>
