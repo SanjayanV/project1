@@ -7,7 +7,8 @@ import { useState } from 'react';
 import Login from "./Components/Login1.jsx";
 import LoginFar from "./Components/LoginFar.jsx";
 import PrivateRoute from "./Components/PrivateRoute.jsx";
-
+import CustomerDashboard from "./Components/CustomerDashboard.jsx";
+import Payment from "./Components/Payment.jsx";
 function App() {
   const [isAuthenticated, setAuth] = useState(false);
 
@@ -28,10 +29,20 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/consumer-dashboard"
+            element={
+              <PrivateRoute isAuthenticated={isAuthenticated}>
+                <CustomerDashboard />
+              </PrivateRoute>
+            }
+          />
           <Route path="/addproducts" element={<PrivateRoute isAuthenticated={isAuthenticated}>
                 <ProductSelection />
               </PrivateRoute>} />
         </Routes>
+
+       
       </Router>
     </>
   );

@@ -170,7 +170,7 @@ const Home = () => {
           </motion.p>
           <Link to="/login">
             <motion.button 
-              className="bg-gradient-to-r from-emerald-500 to-green-600 text-white px-12 py-4 rounded-full font-semibold text-lg hover:from-emerald-600 hover:to-green-700 transition-all duration-300 shadow-2xl hover:shadow-xl transform hover:-translate-y-1"
+              className="bg-gradient-to-r from-emerald-500 to-green-600 text-white px-12 py-4 rounded-lg font-semibold text-lg hover:from-emerald-600 hover:to-green-700 transition-all duration-300 shadow-2xl hover:shadow-xl transform hover:-translate-y-1"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               initial={{ opacity: 0 }}

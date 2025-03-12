@@ -116,19 +116,7 @@ const ProductSelection = () => {
     setBillList((prev) => prev.filter((item) => item.id !== id));
   };
   
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      localStorage.removeItem("token");
-      localStorage.removeItem("role");
-      localStorage.removeItem("userDetails");
-      navigate("/login");
-    } catch (err) {
-      console.error("Logout error:", err.message);
-      setError("Failed to log out.");
-    }
-  };
-
+  
 
   const handleSaveProducts = async () => {
     try {
@@ -234,7 +222,7 @@ const ProductSelection = () => {
           <motion.button className="p-2 bg-gradient-to-br from-[black] to-[#393939] rounded-full hover:bg-teal-200" whileHover={{ scale: 1.1 }}>
             <User className="w-6 h-6 text-green-600" />
           </motion.button>
-          <motion.button onClick={handleLogout} className="p-2 bg-gradient-to-br from-[black] to-[#393939] rounded-full hover:bg-red-200" whileHover={{ scale: 1.1 }}>
+          <motion.button onClick={()=>{navigate("/dashboard")}} className="p-2 bg-gradient-to-br from-[black] to-[#393939] rounded-full hover:bg-red-200" whileHover={{ scale: 1.1 }}>
               <LogOut className="w-6 h-6 text-red-800" />
           </motion.button>
         </div>

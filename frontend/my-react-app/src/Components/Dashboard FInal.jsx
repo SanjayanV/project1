@@ -6,10 +6,10 @@ import { getDatabase, ref, get } from "firebase/database"; // Firebase Realtime 
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from "chart.js";
 import { Bar } from "react-chartjs-2";
 
-// Register ChartJS components
+
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
-// Translations object
+
 const translations = {
   "en-IN": {
     helloFarmer: "Hello, Farmer!",
@@ -464,164 +464,162 @@ const Dashboard = () => {
 
   return (
     <motion.div
-      className={`min-h-screen p-6 ${darkMode ? "bg-gray-900 text-gray-100" : "bg-gradient-to-br from-green-50 via-yellow-50 to-blue-50 text-black"} ${showGuide ? "backdrop-blur-sm" : ""}`}
+      className={`min-h-screen p-6 font-sans ${darkMode ? "bg-gray-900 text-gray-100" : "bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-800"} ${showGuide ? "backdrop-blur-md" : ""}`}
       variants={pageVariants}
       initial="initial"
       animate="animate"
     >
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start mb-6 space-y-4 md:space-y-0 md:space-x-6">
-        <motion.div className="flex items-center space-x-4">
-          <img src="https://via.placeholder.com/50" alt="Farmer Logo" className="w-16 h-16 rounded-full" />
+      <div className="flex flex-col lg:flex-row justify-between items-start mb-8 space-y-6 lg:space-y-0 lg:space-x-9">
+        <motion.div className="flex items-center space-x-6">
+          <img src="" alt="Farmer Logo" className="w-20 h-20 rounded-full bg-gray-200" />
           <div>
-            <h2 className="text-2xl font-bold text-green-700">{translations[language].helloFarmer.replace("Farmer", farmerName)}</h2>
-            <div className="relative mt-2">
-              <motion.button
-                className="px-3 py-1 bg-indigo-500 text-white rounded-full hover:bg-indigo-600 text-xs"
-                onClick={() => setShowSettings(!showSettings)}
-                whileHover={{ scale: 1.05 }}
+            <h2 className="text-3xl justify-center font-bold text-green-600">{translations[language].helloFarmer.replace("Farmer", farmerName)}</h2>
+            <motion.button
+              className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm font-medium"
+              onClick={() => setShowSettings(!showSettings)}
+              whileHover={{ scale: 1.05 }}
+            >
+              {translations[language].settings}
+            </motion.button>
+            {showSettings && (
+              <motion.div
+                className={`absolute mt-2 w-56 ${darkMode ? "bg-gray-800 text-gray-200 border-gray-700" : "bg-white text-gray-800 border-gray-200"} rounded-xl shadow-lg border p-4 z-10`}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
               >
-                {translations[language].settings}
-              </motion.button>
-              {showSettings && (
-                <motion.div
-                  className={`absolute left-0 mt-1 w-48 ${darkMode ? "bg-gray-800 text-gray-200 border-gray-700" : "bg-white text-black border-gray-200"} rounded-md shadow-md border p-2 z-10`}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -10 }}
+                <button
+                  className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                  onClick={() => setDarkMode(!darkMode)}
                 >
-                  <button
-                    className="w-full text-left px-2 py-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                    onClick={() => setDarkMode(!darkMode)}
-                  >
-                    {darkMode ? translations[language].lightMode : translations[language].darkMode}
-                  </button>
-                  <select
-                    className="w-full text-left px-2 py-1 text-xs bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                    value={language}
-                    onChange={(e) => setLanguage(e.target.value)}
-                  >
-                    <option value="en-IN" className="text-black">English (India)</option>
-                    <option value="ta-IN" className="text-black">தமிழ் (Tamil)</option>
-                    <option value="hi-IN" className="text-black">हिन्दी (Hindi)</option>
-                    <option value="en-US" className="text-black">English (US)</option>
-                  </select>
-                  <button className="w-full text-left px-2 py-1 text-xs hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
-                    {translations[language].help}
-                  </button>
-                  <button
-                    className="w-full text-left px-2 py-1 text-xs text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                    onClick={handleLogout} // Added logout handler
-                  >
-                    {translations[language].logout}
-                  </button>
-                </motion.div>
-              )}
-            </div>
+                  {darkMode ? translations[language].lightMode : translations[language].darkMode}
+                </button>
+                <select
+                  className="w-full text-left px-3 py-2 text-sm bg-transparent hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                >
+                  <option value="en-IN" className="text-gray-800">English (India)</option>
+                  <option value="ta-IN" className="text-gray-800">தமிழ் (Tamil)</option>
+                  <option value="hi-IN" className="text-gray-800">हिन्दी (Hindi)</option>
+                  <option value="en-US" className="text-gray-800">English (US)</option>
+                </select>
+                <button className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
+                  {translations[language].help}
+                </button>
+                <button
+                  className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                  onClick={handleLogout}
+                >
+                  {translations[language].logout}
+                </button>
+              </motion.div>
+            )}
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full md:w-2/3 order-status">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full lg:w-2/3">
           {["confirmed", "dispatched", "cancelled"].map((status) => (
             <motion.div
               key={status}
-              className={`p-4 rounded-lg shadow-md border ${status} ${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"}`}
+              className={`p-6 rounded-xl shadow-lg border ${status} ${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"}`}
               whileHover={glossyHover}
             >
-              <h3 className={`font-semibold text-lg ${status === "confirmed" ? "text-green-600" : status === "dispatched" ? "text-yellow-600" : "text-red-600"}`}>
+              <h3 className={`font-semibold text-xl ${status === "confirmed" ? "text-green-600" : status === "dispatched" ? "text-yellow-600" : "text-red-600"}`}>
                 {translations[language][status]}
               </h3>
               {orders.filter(o => o.status.toLowerCase() === status).slice(0, 2).map((order, idx) => (
-                <p key={idx} className={`mt-2 text-sm ${darkMode ? "text-gray-200" : "text-black"}`}>Order #{order.id} - ₹{order.totalAmount}</p>
+                <p key={idx} className={`mt-3 text-base ${darkMode ? "text-gray-300" : "text-gray-700"}`}>Order #{order.id} - ₹{order.totalAmount}</p>
               ))}
             </motion.div>
           ))}
         </div>
 
         <motion.div
-          className={`p-4 rounded-lg shadow-md border weather ${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"} w-full md:w-64`}
+          className={`p-6 rounded-xl shadow-lg border weather ${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"} w-full lg:w-80`}
           whileHover={glossyHover}
         >
-          <h3 className="font-semibold text-lg text-blue-600">{translations[language].weather}</h3>
+          <h3 className="font-semibold text-xl text-blue-600">{translations[language].weather}</h3>
           {weather ? (
             weather.error ? (
-              <p className={`mt-2 text-sm ${darkMode ? "text-gray-200" : "text-black"}`}>{weather.error}</p>
+              <p className={`mt-4 text-base ${darkMode ? "text-gray-300" : "text-gray-700"}`}>{weather.error}</p>
             ) : (
-              <div className="mt-2 text-center">
-                <span className="text-4xl">{getWeatherEmoji(weather.weather[0].description)}</span>
-                <p className={`text-sm font-medium ${darkMode ? "text-gray-200" : "text-black"} mt-2 capitalize`}>{weather.weather[0].description}</p>
-                <p className="text-2xl font-bold text-blue-600">{weather.main.temp}°C</p>
-                <p className={`text-sm ${darkMode ? "text-gray-200" : "text-black"} mt-1`}>{weather.name}, {weather.country}</p>
+              <div className="mt-4 text-center">
+                <span className="text-5xl">{getWeatherEmoji(weather.weather[0].description)}</span>
+                <p className={`text-base font-medium ${darkMode ? "text-gray-300" : "text-gray-700"} mt-2 capitalize`}>{weather.weather[0].description}</p>
+                <p className="text-3xl font-bold text-blue-600">{weather.main.temp}°C</p>
+                <p className={`text-base ${darkMode ? "text-gray-300" : "text-gray-700"} mt-2`}>{weather.name}, {weather.country}</p>
               </div>
             )
           ) : (
-            <p className={`mt-2 text-sm ${darkMode ? "text-gray-200" : "text-black"}`}>Fetching weather...</p>
+            <p className={`mt-4 text-base ${darkMode ? "text-gray-300" : "text-gray-700"}`}>Fetching weather...</p>
           )}
         </motion.div>
       </div>
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="space-y-4 earnings-orders">
-          <motion.div className={`p-4 rounded-lg shadow-md border total-earnings ${darkMode ? "bg-gray-800" : "bg-white"}`} whileHover={glossyHover}>
-            <h3 className="font-semibold text-lg text-green-600">{translations[language].totalEarnings}</h3>
-            <p className={`mt-2 text-3xl font-bold ${darkMode ? "text-gray-100" : "text-black"}`}>₹{earnings}</p>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-3 space-y-6">
+          <motion.div className={`p-6 rounded-xl shadow-lg border total-earnings ${darkMode ? "bg-gray-800" : "bg-white"}`} whileHover={glossyHover}>
+            <h3 className="font-semibold text-xl text-green-600">{translations[language].totalEarnings}</h3>
+            <p className={`mt-4 text-4xl font-bold ${darkMode ? "text-gray-100" : "text-gray-800"}`}>₹{earnings}</p>
           </motion.div>
 
-          <motion.div className={`p-4 rounded-lg shadow-md border current-orders ${darkMode ? "bg-gray-800" : "bg-white"}`} whileHover={glossyHover}>
-            <h3 className="font-semibold text-lg text-green-600">{translations[language].currentOrders}</h3>
+          <motion.div className={`p-6 rounded-xl shadow-lg border current-orders ${darkMode ? "bg-gray-800" : "bg-white"}`} whileHover={glossyHover}>
+            <h3 className="font-semibold text-xl text-green-600">{translations[language].currentOrders}</h3>
             {orders.filter(o => o.status === "Pending" || o.status === "Processing").slice(0, 2).map((order, idx) => (
-              <p key={idx} className={`mt-2 text-sm ${darkMode ? "text-gray-200" : "text-black"}`}>Order #{order.id} - ₹{order.totalAmount} ({order.status})</p>
+              <p key={idx} className={`mt-3 text-base ${darkMode ? "text-gray-300" : "text-gray-700"}`}>Order #{order.id} - ₹{order.totalAmount} ({order.status})</p>
             ))}
           </motion.div>
 
-          <motion.div className={`p-4 rounded-lg shadow-md border previous-orders ${darkMode ? "bg-gray-800" : "bg-white"}`} whileHover={glossyHover}>
-            <h3 className="font-semibold text-lg text-yellow-600">{translations[language].previousOrders}</h3>
+          <motion.div className={`p-6 rounded-xl shadow-lg border previous-orders ${darkMode ? "bg-gray-800" : "bg-white"}`} whileHover={glossyHover}>
+            <h3 className="font-semibold text-xl text-yellow-600">{translations[language].previousOrders}</h3>
             {orders.filter(o => o.status === "Completed").slice(0, 2).map((order, idx) => (
-              <p key={idx} className={`mt-2 text-sm ${darkMode ? "text-gray-200" : "text-black"}`}>Order #{order.id} - ₹{order.totalAmount}</p>
+              <p key={idx} className={`mt-3 text-base ${darkMode ? "text-gray-300" : "text-gray-700"}`}>Order #{order.id} - ₹{order.totalAmount}</p>
             ))}
           </motion.div>
         </div>
 
-        <div className="space-y-4 recommendations">
-          <motion.div className={`p-4 rounded-lg shadow-md border sell-surplus ${darkMode ? "bg-gray-800" : "bg-white"}`} whileHover={glossyHover}>
-            <h3 className="font-semibold text-lg text-blue-600">{translations[language].sellSurplus}</h3>
-            <motion.button className="mt-2 px-3 py-1 bg-blue-500 text-white rounded-full hover:bg-blue-600 text-xs" whileHover={{ scale: 1.05 }}>
+        <div className="lg:col-span-3 space-y-6">
+          <motion.div className={`p-6 rounded-xl shadow-lg border sell-surplus ${darkMode ? "bg-gray-800" : "bg-white"}`} whileHover={glossyHover}>
+            <h3 className="font-semibold text-xl text-blue-600">{translations[language].sellSurplus}</h3>
+            <motion.button className="mt-4 px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 text-sm font-medium" whileHover={{ scale: 1.05 }}>
               {translations[language].sellSurplus}
             </motion.button>
           </motion.div>
 
-          <motion.div className={`p-4 rounded-lg shadow-md border crop-recommendation ${darkMode ? "bg-gray-800" : "bg-white"}`} whileHover={glossyHover}>
-            <h3 className="font-semibold text-lg text-orange-600">{translations[language].cropRecommendation}</h3>
-            <p className={`mt-2 text-sm ${darkMode ? "text-gray-200" : "text-black"}`}>Recommended Crop: Onions</p>
+          <motion.div className={`p-6 rounded-xl shadow-lg border crop-recommendation ${darkMode ? "bg-gray-800" : "bg-white"}`} whileHover={glossyHover}>
+            <h3 className="font-semibold text-xl text-orange-600">{translations[language].cropRecommendation}</h3>
+            <p className={`mt-4 text-base ${darkMode ? "text-gray-300" : "text-gray-700"}`}>Recommended Crop: Onions</p>
           </motion.div>
 
-          <motion.div className={`p-4 rounded-lg shadow-md border farming-news ${darkMode ? "bg-gray-800" : "bg-white"}`} whileHover={glossyHover}>
-            <h3 className="font-semibold text-lg text-green-600">{translations[language].farmingNews}</h3>
-            <p className={`mt-2 text-sm ${darkMode ? "text-gray-200" : "text-black"}`}>Latest updates on farming techniques...</p>
+          <motion.div className={`p-6 rounded-xl shadow-lg border farming-news ${darkMode ? "bg-gray-800" : "bg-white"}`} whileHover={glossyHover}>
+            <h3 className="font-semibold text-xl text-green-600">{translations[language].farmingNews}</h3>
+            <p className={`mt-4 text-base ${darkMode ? "text-gray-300" : "text-gray-700"}`}>Latest updates on farming techniques...</p>
           </motion.div>
         </div>
 
-        <div className="space-y-4 products-graph">
-          <motion.div className={`p-4 rounded-lg shadow-md border orders-graph ${darkMode ? "bg-gray-800" : "bg-white"} h-72`} whileHover={glossyHover}>
-            <h3 className="font-semibold text-lg text-red-600">{translations[language].ordersGraph}</h3>
-            <div className="mt-2 h-56"><Bar data={ordersData} options={chartOptions} /></div>
+        <div className="lg:col-span-3 space-y-6">
+          <motion.div className={`p-6 rounded-xl shadow-lg border orders-graph ${darkMode ? "bg-gray-800" : "bg-white"} h-96`} whileHover={glossyHover}>
+            <h3 className="font-semibold text-xl text-red-600">{translations[language].ordersGraph}</h3>
+            <div className="mt-4 h-72"><Bar data={ordersData} options={chartOptions} /></div>
           </motion.div>
 
-          <motion.div className={`p-4 rounded-lg shadow-md border your-products ${darkMode ? "bg-gray-800" : "bg-white"}`} whileHover={glossyHover}>
-            <h3 className="font-semibold text-lg text-teal-600">{translations[language].yourProducts}</h3>
+          <motion.div className={`p-6 rounded-xl shadow-lg border your-products ${darkMode ? "bg-gray-800" : "bg-white"}`} whileHover={glossyHover}>
+            <h3 className="font-semibold text-xl text-teal-600">{translations[language].yourProducts}</h3>
             {products.length === 0 ? (
-              <p className="mt-3 text-sm text-gray-500">
-                No products available. <Link to="/addproducts" className="text-teal-600">{translations[language].addProduct}</Link>
+              <p className="mt-4 text-base text-gray-500">
+                No products available. <Link to="/addproducts" className="text-teal-600 font-medium">{translations[language].addProduct}</Link>
               </p>
             ) : (
-              <div className="grid grid-cols-2 gap-4 mt-3">
+              <div className="grid grid-cols-2 gap-4 mt-4">
                 {products.map((product) => (
-                  <motion.div key={product.id} whileHover={{ scale: 1.05 }} className="text-center p-2 rounded-lg bg-teal-50">
-                    <img src={product.image} alt={product.name} className="w-16 h-16 object-cover rounded-lg mx-auto" />
-                    <p className="text-sm font-medium mt-2">{product.name}</p>
-                    <p className="text-xs text-gray-600">₹{product.price}/kg</p>
-                    <p className="text-xs text-gray-500">{product.stock} kg available</p>
+                  <motion.div key={product.id} whileHover={{ scale: 1.05 }} className="p-3 rounded-lg bg-teal-50">
+                    <img src={product.image} alt={product.name} className="w-20 h-20 object-cover rounded-lg mx-auto" />
+                    <p className="text-base font-medium mt-2">{product.name}</p>
+                    <p className="text-sm text-gray-600">₹{product.price}/kg</p>
+                    <p className="text-sm text-gray-500">{product.stock} kg available</p>
                   </motion.div>
                 ))}
               </div>
@@ -629,18 +627,33 @@ const Dashboard = () => {
           </motion.div>
         </div>
 
-        <div className="space-y-4 flex flex-col items-center actions">
-          <motion.button className={`w-full py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 text-sm new-message`} onClick={() => alert(translations[language].newMessage)} whileHover={{ scale: 1.05 }}>
+        <div className="lg:col-span-3 space-y-6 flex flex-col items-center">
+          <motion.button
+            className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 text-base font-medium new-message"
+            onClick={() => alert(translations[language].newMessage)}
+            whileHover={{ scale: 1.05 }}
+          >
             {translations[language].newMessage}
           </motion.button>
-          <motion.button className={`w-full py-2 bg-purple-500 text-white rounded-full hover:bg-purple-600 text-sm feedback`} onClick={() => alert(translations[language].feedback)} whileHover={{ scale: 1.05 }}>
+          <motion.button
+            className="w-full py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg hover:from-purple-600 hover:to-purple-700 text-base font-medium feedback"
+            onClick={() => alert(translations[language].feedback)}
+            whileHover={{ scale: 1.05 }}
+          >
             {translations[language].feedback}
           </motion.button>
-          <motion.button className={`w-full py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 text-sm withdraw-product`} onClick={() => alert(translations[language].withdrawProduct)} whileHover={{ scale: 1.05 }}>
+          <motion.button
+            className="w-full py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:from-orange-600 hover:to-orange-700 text-base font-medium withdraw-product"
+            onClick={() => alert(translations[language].withdrawProduct)}
+            whileHover={{ scale: 1.05 }}
+          >
             {translations[language].withdrawProduct}
           </motion.button>
           <Link to="/addproducts" className="w-full">
-            <motion.button className={`w-full py-2 bg-green-500 text-white rounded-full hover:bg-green-600 text-sm add-product`} whileHover={{ scale: 1.05 }}>
+            <motion.button
+              className="w-full py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 text-base font-medium add-product"
+              whileHover={{ scale: 1.05 }}
+            >
               {translations[language].addProduct}
             </motion.button>
           </Link>
@@ -649,13 +662,13 @@ const Dashboard = () => {
 
       {/* Quick Start Guide Trigger */}
       {!showGuide && (
-        <motion.div className={`fixed bottom-4 right-4 p-3 ${darkMode ? "bg-gray-800 text-gray-200" : "bg-white text-black"} rounded-md shadow-md border ${darkMode ? "border-gray-700" : "border-gray-200"}`}>
-          <p className="text-sm font-medium">{translations[language].newToDashboard}</p>
-          <div className="flex space-x-2 mt-2">
-            <button className="px-3 py-1 bg-green-500 text-white rounded-full hover:bg-green-600 text-xs" onClick={() => setShowGuide(true)}>
+        <motion.div className={`fixed bottom-6 right-6 p-4 ${darkMode ? "bg-gray-800 text-gray-200 border-gray-700" : "bg-white text-gray-800 border-gray-200"} rounded-xl shadow-lg border`}>
+          <p className="text-base font-medium">{translations[language].newToDashboard}</p>
+          <div className="flex space-x-3 mt-3">
+            <button className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm font-medium" onClick={() => setShowGuide(true)}>
               {translations[language].yes}
             </button>
-            <button className="px-3 py-1 bg-gray-500 text-white rounded-full hover:bg-gray-600 text-xs" onClick={() => setShowGuide(false)}>
+            <button className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 text-sm font-medium" onClick={() => setShowGuide(false)}>
               {translations[language].no}
             </button>
           </div>
@@ -667,25 +680,25 @@ const Dashboard = () => {
         <motion.div className="fixed inset-0 z-20 pointer-events-none" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <div className="relative pointer-events-auto">
             <motion.div
-              className={`absolute p-4 ${darkMode ? "bg-gray-800 text-gray-200" : "bg-white text-black"} rounded-md shadow-md border ${darkMode ? "border-gray-700" : "border-gray-200"} z-40`}
-              style={{ top: (document.querySelector(guideSteps[guideStep].target)?.getBoundingClientRect().top || 0) - 120 + window.scrollY, left: "50%", transform: "translateX(-50%)", width: "300px" }}
+              className={`absolute p-4 ${darkMode ? "bg-gray-800 text-gray-200 border-gray-700" : "bg-white text-gray-800 border-gray-200"} rounded-xl shadow-lg border z-40`}
+              style={{ top: (document.querySelector(guideSteps[guideStep].target)?.getBoundingClientRect().top || 0) - 140 + window.scrollY, left: "50%", transform: "translateX(-50%)", width: "320px" }}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
             >
-              <p className="text-sm mb-2">{translations[language][guideSteps[guideStep].textKey]}</p>
-              <div className="flex space-x-2">
+              <p className="text-base mb-3">{translations[language][guideSteps[guideStep].textKey]}</p>
+              <div className="flex space-x-3">
                 <button
-                  className="px-3 py-1 bg-green-500 text-white rounded-full hover:bg-green-600 text-xs"
+                  className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 text-sm font-medium"
                   onClick={() => guideStep < guideSteps.length - 1 ? setGuideStep(prev => prev + 1) : setShowGuide(false)}
                 >
                   {guideStep < guideSteps.length - 1 ? translations[language].next : translations[language].finish}
                 </button>
                 {guideStep > 0 && (
-                  <button className="px-3 py-1 bg-gray-500 text-white rounded-full hover:bg-gray-600 text-xs" onClick={() => setGuideStep(prev => prev - 1)}>
+                  <button className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 text-sm font-medium" onClick={() => setGuideStep(prev => prev - 1)}>
                     Back
                   </button>
                 )}
-                <button className="px-3 py-1 bg-red-500 text-white rounded-full hover:bg-red-600 text-xs" onClick={() => setShowGuide(false)}>
+                <button className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm font-medium" onClick={() => setShowGuide(false)}>
                   Close
                 </button>
               </div>
@@ -707,5 +720,7 @@ const Dashboard = () => {
     </motion.div>
   );
 };
+
+
 
 export default Dashboard;

@@ -57,7 +57,7 @@ const Login = ({ setAuth }) => {
           toast.success("Login Successful!");
           setAuth(true);
           setTimeout(() => {
-            navigate(userRole === "farmer" ? "/dashboard" : "/home");
+            navigate(userRole === "farmer" ? "/dashboard" : "/consumer-dashboard");
           }, 100);
         } else {
           console.log("No role found for existing user, prompting role selection");
@@ -105,7 +105,7 @@ const Login = ({ setAuth }) => {
       toast.success("Sign-up Successful!");
       setGoogleUser(null);
       setAuth(true);
-      navigate(role === "farmer" ? "/dashboard" : "/home");
+      navigate(role === "farmer" ? "/dashboard" : "/consumer-dashboard");
     } catch (error) {
       console.error("Google sync error:", error.message);
       toast.error(error.message || "Failed to complete Google sign-up");
@@ -197,13 +197,12 @@ const Login = ({ setAuth }) => {
       {/* Left Side - Video Background */}
       <div className="relative w-1/2 h-full overflow-hidden">
         <video autoPlay loop muted className="absolute w-full h-full object-cover">
-          <source src="/left.mp4" type="video/mp4" />
+          <source src="left.mp4" type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-black bg-opacity-50"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center text-white">
           <h1 className="text-4xl font-bold">FARMER TO CONSUMER COMMUNITY</h1>
           <p className="mt-2 text-gray-300">Home to Millions of people worldwide</p>
-          <a href="#" className="mt-2 inline-block text-green-400">Know more</a>
         </div>
       </div>
 

@@ -72,7 +72,7 @@ const Login = () => {
             <p className="text-lg text-gray-100 mb-8 opacity-85 leading-relaxed">
               Enjoy farm-fresh produce at fair prices, delivered directly from the source.
             </p>
-            <Link to="/logincon">
+            <Link to="/loginfar">
               <button className="bg-rose-400 text-purple-900 font-semibold py-4 px-12 rounded-full shadow-lg hover:bg-rose-300 hover:shadow-xl hover:scale-105 transition-all duration-300">
                 Start Shopping
               </button>
